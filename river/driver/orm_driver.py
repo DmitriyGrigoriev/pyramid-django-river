@@ -46,21 +46,21 @@ class OrmDriver(RiverDriver):
         for g in as_user.groups.all():
             group_q = group_q | Q(groups__in=[g])
 
-        permissions = []
-        for backend in auth.get_backends():
-            permissions.extend(backend.get_all_permissions(as_user))
+        # Используем стандартный Django API вместо прямого обращения к backends
+        permissions = as_user.get_all_permissions()
 
         permission_q = Q()
         for p in permissions:
-            label, codename = p.split('.')
-            permission_q = permission_q | Q(permissions__content_type__app_label=label,
-                                            permissions__codename=codename)
+            if '.' in p:  # Проверяем формат разрешения
+                label, codename = p.split('.', 1)  # Используем maxsplit=1 для безопасности
+                permission_q = permission_q | Q(permissions__content_type__app_label=label,
+                                                permissions__codename=codename)
 
         return TransitionApproval.objects.filter(
             Q(workflow=self.workflow, status=PENDING) &
             (
-                    (Q(transactioner__isnull=True) | Q(transactioner=as_user)) &
-                    (Q(permissions__isnull=True) | permission_q) &
-                    (Q(groups__isnull=True) | group_q)
+                (Q(transactioner__isnull=True) | Q(transactioner=as_user)) &
+                (Q(permissions__isnull=True) | permission_q) &
+                (Q(groups__isnull=True) | group_q)
             )
         )
