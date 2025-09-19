@@ -17,13 +17,13 @@ setup(
     author='Ahmet DAL',
     author_email='ceahmetdal@gmail.com',
     packages=find_packages(),
-    url='https://github.com/javrasya/django-river.git',
+    url='https://github.com/DmitriyGrigoriev/pyramid-django-river.git',
     description='Django Workflow Library',
     long_description=long_description,
     install_requires=[
         "Django",
         "django-mptt==0.9.1",
-        "django-cte==1.1.4",
+        "django-cte>=2.0.0",
         "django-codemirror2==0.2"
     ],
     include_package_data=True,
