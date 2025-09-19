@@ -12,7 +12,7 @@ except IOError as err:
     sys.exit(1)
 
 setup(
-    name='django-river',
+    name='pyramid-django-river',
     version='3.3.0',
     author='Ahmet DAL',
     author_email='ceahmetdal@gmail.com',
