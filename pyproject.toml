@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "pyramid-django-river"
+version = "3.3.0"
+description = "Django Workflow Library"
+authors = ["Ahmet DAL <ceahmetdal@gmail.com>"]
+license = "BSD"
+readme = "README.rst"
+repository = "https://github.com/DmitriyGrigoriev/pyramid-django-river.git"
+packages = [
+    { include = "river" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+Django = "^4.2"
+django-mptt = "0.9.1"
+django-cte = ">=2.0.0"
+django-codemirror2 = "0.2"
+
+[build-system]
+requires = ["poetry-core>=1.9"]
+build-backend = "poetry.core.masonry.api"
