@@ -14,7 +14,7 @@ class OrmDriver(RiverDriver):
             TransitionApproval.objects.filter(
                 workflow=self.workflow, status=PENDING
             ).values(
-                'workflow', 'object_id', 'transition'
+                'workflow_id', 'object_id', 'transition_id'
             ).annotate(min_priority=Min('priority'))
         )
 
