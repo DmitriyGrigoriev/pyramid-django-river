@@ -3,6 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from river.driver.mssql_driver import MsSqlDriver
 from river.driver.orm_driver import OrmDriver
 from river.models import State, TransitionApprovalMeta, Workflow, app_config, TransitionMeta
+from river.core.workflow_cache import get_workflow
 
 
 class ClassWorkflowObject(object):
@@ -10,7 +11,7 @@ class ClassWorkflowObject(object):
     def __init__(self, wokflow_object_class, field_name):
         self.wokflow_object_class = wokflow_object_class
         self.field_name = field_name
-        self.workflow = Workflow.objects.filter(field_name=self.field_name, content_type=self._content_type).first()
+        self.workflow = get_workflow(self._content_type, self.field_name)
         self._cached_river_driver = None
 
     @property
@@ -34,8 +35,8 @@ class ClassWorkflowObject(object):
 
     @property
     def initial_state(self):
-        workflow = Workflow.objects.filter(content_type=self._content_type, field_name=self.field_name).first()
-        return workflow.initial_state if workflow else None
+        wf = get_workflow(self._content_type, self.field_name)
+        return wf.initial_state if wf else None
 
     @property
     def final_states(self):

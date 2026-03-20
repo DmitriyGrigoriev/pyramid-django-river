@@ -4,7 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from django.dispatch import Signal
 
-from river.models import Workflow
+from river.core.workflow_cache import get_workflow_or_raise
 from river.models.hook import BEFORE, AFTER
 from river.models.on_approved_hook import OnApprovedHook
 from river.models.on_complete_hook import OnCompleteHook
@@ -29,7 +29,7 @@ class TransitionSignal(object):
         self.field_name = field_name
         self.transition_approval = transition_approval
         self.content_type = ContentType.objects.get_for_model(self.workflow_object.__class__)
-        self.workflow = Workflow.objects.get(content_type=self.content_type, field_name=self.field_name)
+        self.workflow = get_workflow_or_raise(self.content_type, self.field_name)
 
     def __enter__(self):
         if self.status:
@@ -82,7 +82,7 @@ class ApproveSignal(object):
         self.field_name = field_name
         self.transition_approval = transition_approval
         self.content_type = ContentType.objects.get_for_model(self.workflow_object.__class__)
-        self.workflow = Workflow.objects.get(content_type=self.content_type, field_name=self.field_name)
+        self.workflow = get_workflow_or_raise(self.content_type, self.field_name)
 
     def __enter__(self):
         for hook in OnApprovedHook.objects.filter(
@@ -134,7 +134,7 @@ class OnCompleteSignal(object):
         self.workflow = getattr(self.workflow_object.river, self.field_name)
         self.status = self.workflow.on_final_state
         self.content_type = ContentType.objects.get_for_model(self.workflow_object.__class__)
-        self.workflow = Workflow.objects.get(content_type=self.content_type, field_name=self.field_name)
+        self.workflow = get_workflow_or_raise(self.content_type, self.field_name)
 
     def __enter__(self):
         if self.status:

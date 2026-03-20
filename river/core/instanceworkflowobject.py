@@ -9,6 +9,7 @@ from django.utils import timezone
 
 from river.config import app_config
 from river.models import TransitionApproval, PENDING, State, APPROVED, Workflow, CANCELLED, Transition, DONE, JUMPED
+from river.core.workflow_cache import get_workflow
 from river.signals import ApproveSignal, TransitionSignal, OnCompleteSignal
 from river.utils.error_code import ErrorCode
 from river.utils.exceptions import RiverException
@@ -23,7 +24,7 @@ class InstanceWorkflowObject(object):
         self.workflow_object = workflow_object
         self.content_type = app_config.CONTENT_TYPE_CLASS.objects.get_for_model(self.workflow_object)
         self.field_name = field_name
-        self.workflow = Workflow.objects.filter(content_type=self.content_type, field_name=self.field_name).first()
+        self.workflow = get_workflow(self.content_type, self.field_name)
         self.initialized = False
 
     @transaction.atomic
