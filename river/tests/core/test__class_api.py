@@ -1,3 +1,4 @@
+import warnings
 from datetime import datetime, timedelta
 
 from django.contrib.contenttypes.models import ContentType
@@ -78,6 +79,25 @@ class ClassApiTest(TestCase):
                 has_property("transition", flow.transitions_metas[0].transitions.first())
             )
         ))
+
+    def test_shouldNotEmitDeprecationWarningsWhenBuildingAvailableApprovals(self):
+        authorized_permission = PermissionObjectFactory()
+        authorized_user = UserObjectFactory(user_permissions=[authorized_permission])
+
+        state1 = RawState("state1")
+        state2 = RawState("state2")
+
+        authorization_policies = [AuthorizationPolicyBuilder().with_permission(authorized_permission).build()]
+        FlowBuilder("my_field", self.content_type) \
+            .with_transition(state1, state2, authorization_policies) \
+            .build()
+
+        with warnings.catch_warnings(record=True) as caught_warnings:
+            warnings.simplefilter("always")
+            BasicTestModel.river.my_field.get_available_approvals(as_user=authorized_user)
+
+        dep_warnings = [warning for warning in caught_warnings if issubclass(warning.category, DeprecationWarning)]
+        assert_that(dep_warnings, has_length(0))
 
     def test__shouldReturnApprovalsOnTimeWhenTooManyWorkflowObject(self):
         authorized_permission = PermissionObjectFactory()
