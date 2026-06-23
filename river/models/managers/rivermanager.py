@@ -1,10 +1,10 @@
-from django_cte import CTEQuerySet
+from django.db.models import QuerySet
 from django.db.models.manager import BaseManager
 
 from river.config import app_config
 
 
-class RiverQuerySet(CTEQuerySet):
+class RiverQuerySet(QuerySet):
     def first(self):
         if app_config.IS_MSSQL:
             return next(iter(self), None)
