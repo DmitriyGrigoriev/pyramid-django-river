@@ -1,6 +1,7 @@
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import ProtectedError
 from django.test import TestCase
+from django_cte import CTEQuerySet
 from hamcrest import assert_that, calling, raises
 from river.models import APPROVED, TransitionApproval
 from river.models.factories import StateObjectFactory, TransitionApprovalMetaFactory, TransitionMetaFactory, WorkflowFactory
@@ -12,6 +13,10 @@ from rivertest.flowbuilder import FlowBuilder, RawState
 
 
 class TransitionApprovalModelTest(TestCase):
+    def test_queryset_shouldSupportCteOperations(self):
+        assert isinstance(TransitionApproval.objects.all(), CTEQuerySet)
+        assert hasattr(TransitionApproval.objects.all(), 'with_cte')
+
     def test_shouldNotAllowWorkflowToBeDeletedWhenThereIsATransitionApproval(self):
         content_type = ContentType.objects.get_for_model(BasicTestModel)
 
