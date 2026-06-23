@@ -1,4 +1,3 @@
-from django.contrib import auth
 from django.db.models import Min, CharField, Q, F
 from django.db.models.functions import Cast
 from django_cte import With
